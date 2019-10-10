@@ -31,10 +31,6 @@ public class ElevatorSimulation implements Runnable {
             SYSTEM_INFORMATION
     );
 
-    public static void main(String[] args) {
-        new ElevatorSimulation().run();
-    }
-
     @Override
     public void run() {
         int simulationIterations = (int) (SIMULATION_LENGTH / SIMULATION_LOOP_PERIOD);

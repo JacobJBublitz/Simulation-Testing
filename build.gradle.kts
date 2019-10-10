@@ -11,12 +11,13 @@ repositories {
 
 dependencies {
     compile(group = "com.github.sh0nk", name = "matplotlib4j", version = "0.4.0")
+    compile(group = "commons-cli", name = "commons-cli", version = "1.4")
 
     testCompile("junit", "junit", "4.12")
 }
 
 configure<ApplicationPluginConvention> {
-    mainClassName = "org.frcteam2910.pidsimexample.Simulation"
+    mainClassName = "org.frcteam2910.pidsimexample.Main"
 }
 
 configure<JavaPluginConvention> {

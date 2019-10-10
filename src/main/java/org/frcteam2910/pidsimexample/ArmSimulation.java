@@ -30,10 +30,6 @@ public class ArmSimulation implements Runnable {
             SYSTEM_INFORMATION
     );
 
-    public static void main(String[] args) {
-        new ArmSimulation().run();
-    }
-
     @Override
     public void run() {
         int simulationIterations = (int) (SIMULATION_LENGTH / SIMULATION_LOOP_PERIOD);
