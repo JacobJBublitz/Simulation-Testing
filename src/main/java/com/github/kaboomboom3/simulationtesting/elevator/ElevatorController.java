@@ -1,6 +1,8 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting.elevator;
 
-import static org.frcteam2910.pidsimexample.Constants.GRAVITATIONAL_ACCELERATION;
+import com.github.kaboomboom3.simulationtesting.Controller;
+
+import static com.github.kaboomboom3.simulationtesting.Constants.GRAVITATIONAL_ACCELERATION;
 
 public final class ElevatorController extends Controller<ElevatorState, Double> {
     private final double positionGain;

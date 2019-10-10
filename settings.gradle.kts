@@ -1,1 +1,1 @@
-rootProject.name = "pidsimexample"
+rootProject.name = "simulationtesting"

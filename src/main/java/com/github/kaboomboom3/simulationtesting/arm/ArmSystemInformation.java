@@ -1,4 +1,6 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting.arm;
+
+import com.github.kaboomboom3.simulationtesting.BrushedDcMotor;
 
 public final class ArmSystemInformation {
     private final BrushedDcMotor motor;

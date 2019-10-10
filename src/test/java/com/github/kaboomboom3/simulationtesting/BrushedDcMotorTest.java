@@ -1,4 +1,4 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting;
 
 import org.junit.Test;
 

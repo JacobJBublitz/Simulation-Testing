@@ -1,4 +1,6 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting.elevator;
+
+import com.github.kaboomboom3.simulationtesting.BrushedDcMotor;
 
 public final class ElevatorSystemInformation {
     private final BrushedDcMotor motor;

@@ -1,4 +1,8 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting.arm;
+
+import com.github.kaboomboom3.simulationtesting.Constants;
+import com.github.kaboomboom3.simulationtesting.Controller;
+import com.github.kaboomboom3.simulationtesting.Units;
 
 public final class ArmController extends Controller<ArmState, Double> {
     private final double angleGain;

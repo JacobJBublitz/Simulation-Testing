@@ -2,7 +2,7 @@ plugins {
     application
 }
 
-group = "org.frcteam2910"
+group = "com.github.kaboomboom3"
 version = "1.0"
 
 repositories {
@@ -17,7 +17,7 @@ dependencies {
 }
 
 configure<ApplicationPluginConvention> {
-    mainClassName = "org.frcteam2910.pidsimexample.Main"
+    mainClassName = "com.github.kaboomboom3.simulationtesting.Main"
 }
 
 configure<JavaPluginConvention> {

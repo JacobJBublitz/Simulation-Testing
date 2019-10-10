@@ -1,4 +1,8 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting.arm;
+
+import com.github.kaboomboom3.simulationtesting.Constants;
+import com.github.kaboomboom3.simulationtesting.SimulatedSystem;
+import com.github.kaboomboom3.simulationtesting.Units;
 
 public final class SimulatedArmSystem extends SimulatedSystem<ArmState, Double> {
     private final ArmSystemInformation systemInformation;

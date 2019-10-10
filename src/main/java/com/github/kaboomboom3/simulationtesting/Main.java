@@ -1,5 +1,7 @@
-package org.frcteam2910.pidsimexample;
+package com.github.kaboomboom3.simulationtesting;
 
+import com.github.kaboomboom3.simulationtesting.arm.ArmSimulation;
+import com.github.kaboomboom3.simulationtesting.elevator.ElevatorSimulation;
 import org.apache.commons.cli.*;
 
 import java.util.TreeMap;
@@ -28,7 +30,7 @@ public class Main {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            formatter.printHelp("pidsimexample", options);
+            formatter.printHelp("simulationtesting", options);
 
             System.exit(1);
         }
