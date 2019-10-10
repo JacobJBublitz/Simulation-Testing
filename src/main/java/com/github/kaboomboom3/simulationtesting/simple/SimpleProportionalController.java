@@ -2,7 +2,7 @@ package com.github.kaboomboom3.simulationtesting.simple;
 
 import com.github.kaboomboom3.simulationtesting.Controller;
 
-public class SimpleProportionalController extends Controller<SimpleState, Double> {
+public final class SimpleProportionalController extends Controller<SimpleState, Double> {
     private final double gain;
 
     private double minOutput = Double.NEGATIVE_INFINITY;

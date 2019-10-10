@@ -1,24 +1,14 @@
 package com.github.kaboomboom3.simulationtesting.arm;
 
-import com.github.kaboomboom3.simulationtesting.Controller;
 import com.github.kaboomboom3.simulationtesting.Motors;
-import com.github.kaboomboom3.simulationtesting.SimulatedSystem;
+import com.github.kaboomboom3.simulationtesting.Simulation;
 import com.github.kaboomboom3.simulationtesting.Units;
 import com.github.sh0nk.matplotlib4j.Plot;
-import com.github.sh0nk.matplotlib4j.PythonExecutionException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmSimulation implements Runnable {
-    private static final double SIMULATION_LOOP_PERIOD = 1.0 * Units.MICROSECOND;
-    private static final double SIMULATION_LENGTH = 1.0 * Units.SECOND;
-
-    private static final double RECORD_LOOP_PERIOD = 5.0 * Units.MILLISECOND;
-
-    private static final double CONTROL_LOOP_PERIOD = 5.0 * Units.MILLISECOND;
-
+public final class ArmSimulation extends Simulation<ArmState, Double> {
     private static final ArmSystemInformation SYSTEM_INFORMATION = new ArmSystemInformation(
             Motors.CIM,
             (10.0 * Units.POUND) * Math.pow(1.0 * Units.FOOT, 2),
@@ -27,55 +17,45 @@ public class ArmSimulation implements Runnable {
     private static final double ANGLE_GAIN = 1.0;
     private static final double ANGULAR_VELOCITY_GAIN = 0.12;
 
-    private SimulatedSystem<ArmState, Double> system = new SimulatedArmSystem(SYSTEM_INFORMATION);
-    private Controller<ArmState, Double> controller = new ArmController(
-            ANGLE_GAIN,
-            ANGULAR_VELOCITY_GAIN,
-            SYSTEM_INFORMATION
-    );
+    private List<Double> recordedTimes = new ArrayList<>();
+    private List<Double> recordedAngles = new ArrayList<>();
+    private List<Double> recordedAngularVelocities = new ArrayList<>();
+    private List<Double> recordedReferences = new ArrayList<>();
+    private List<Double> recordedVoltages = new ArrayList<>();
+    private List<Double> recordedCurrents = new ArrayList<>();
+
+    public ArmSimulation() {
+        super(
+                new SimulatedArmSystem(SYSTEM_INFORMATION),
+                new ArmController(ANGLE_GAIN, ANGULAR_VELOCITY_GAIN, SYSTEM_INFORMATION),
+                new ArmState(0.0, 0.0)
+        );
+
+        setSimulationLength(1.0 * Units.SECOND);
+    }
 
     @Override
-    public void run() {
-        int simulationIterations = (int) (SIMULATION_LENGTH / SIMULATION_LOOP_PERIOD);
-        int simIterationsPerControlIteration = (int) (CONTROL_LOOP_PERIOD / SIMULATION_LOOP_PERIOD);
-        int simIterationsPerRecordIteration = (int) (RECORD_LOOP_PERIOD / SIMULATION_LOOP_PERIOD);
+    protected ArmState getReference(double time, ArmState current) {
+        return new ArmState(90.0 * Units.DEGREE, 0.0 * Units.DEGREE_PER_SECOND);
+    }
 
-        List<Double> recordedTimes = new ArrayList<>();
-        List<Double> recordedAngles = new ArrayList<>();
-        List<Double> recordedAngularVelocities = new ArrayList<>();
-        List<Double> recordedReferences = new ArrayList<>();
-        List<Double> recordedVoltages = new ArrayList<>();
-        List<Double> recordedCurrents = new ArrayList<>();
+    @Override
+    protected void record(double time, ArmState current, ArmState reference, Double input) {
+        recordedTimes.add(time);
+        recordedAngles.add(current.getAngle() / Units.DEGREE);
+        recordedAngularVelocities.add(current.getAngularVelocity() / Units.DEGREE_PER_SECOND);
+        recordedReferences.add(reference.getAngle() / Units.DEGREE);
+        recordedVoltages.add(input);
+        recordedCurrents.add(
+                SYSTEM_INFORMATION.getMotor().estimateCurrentDraw(
+                        input,
+                        SYSTEM_INFORMATION.convertSystemVelocityToMotorVelocity(current.getAngularVelocity())
+                )
+        );
+    }
 
-        ArmState state = new ArmState(0.0, 0.0);
-        controller.setReference(new ArmState(180.0 * Units.DEGREE, 0.0 * Units.DEGREE_PER_SECOND));
-
-        double input = 0.0;
-
-        for (int i = 0; i <= simulationIterations; i++) {
-            if (i % simIterationsPerControlIteration == 0) {
-                // Control iteration
-                input = controller.calculate(state);
-            }
-            if (i % simIterationsPerRecordIteration == 0) {
-                recordedTimes.add(i * SIMULATION_LOOP_PERIOD);
-                recordedAngles.add(state.getAngle() / Units.DEGREE);
-                recordedAngularVelocities.add(state.getAngularVelocity() / Units.DEGREE_PER_SECOND);
-                recordedReferences.add(controller.getReference().getAngle() / Units.DEGREE);
-                recordedVoltages.add(input);
-                recordedCurrents.add(
-                        SYSTEM_INFORMATION.getMotor().estimateCurrentDraw(
-                                input,
-                                SYSTEM_INFORMATION.convertSystemVelocityToMotorVelocity(state.getAngularVelocity())
-                        )
-                );
-            }
-
-            // Simulation iteration
-            state = system.simulate(state, input, SIMULATION_LOOP_PERIOD);
-        }
-
-        Plot plt = Plot.create();
+    @Override
+    protected void makePlots(Plot plt) {
         plt.plot()
                 .label("Angle")
                 .add(recordedTimes, recordedAngles);
@@ -91,10 +71,5 @@ public class ArmSimulation implements Runnable {
         plt.plot()
                 .label("Current")
                 .add(recordedTimes, recordedCurrents);
-        try {
-            plt.show();
-        } catch (IOException | PythonExecutionException e) {
-            e.printStackTrace();
-        }
     }
 }

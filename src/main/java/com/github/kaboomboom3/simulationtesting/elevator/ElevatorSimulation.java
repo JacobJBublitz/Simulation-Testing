@@ -8,7 +8,7 @@ import com.github.sh0nk.matplotlib4j.Plot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElevatorSimulation extends Simulation<ElevatorState, Double> {
+public final class ElevatorSimulation extends Simulation<ElevatorState, Double> {
     private static final ElevatorSystemInformation SYSTEM_INFORMATION = new ElevatorSystemInformation(
             Motors.CIM,
             10.0 * Units.POUND,
