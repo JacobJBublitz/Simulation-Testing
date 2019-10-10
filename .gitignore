@@ -1,0 +1,16 @@
+# Intellij files
+.idea/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Eclipse files
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code files
+.vscode/
