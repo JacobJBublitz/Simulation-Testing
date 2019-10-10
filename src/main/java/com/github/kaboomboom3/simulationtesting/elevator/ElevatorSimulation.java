@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ElevatorSimulation implements Runnable {
     private static final double SIMULATION_LOOP_PERIOD = 1.0 * Units.MICROSECOND;
-    private static final double SIMULATION_LENGTH = 2.5 * Units.SECOND;
+    private static final double SIMULATION_LENGTH = 1.5 * Units.SECOND;
 
     private static final double RECORD_LOOP_PERIOD = 5.0 * Units.MILLISECOND;
 
