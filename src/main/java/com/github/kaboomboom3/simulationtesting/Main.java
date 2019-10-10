@@ -2,6 +2,7 @@ package com.github.kaboomboom3.simulationtesting;
 
 import com.github.kaboomboom3.simulationtesting.arm.ArmSimulation;
 import com.github.kaboomboom3.simulationtesting.elevator.ElevatorSimulation;
+import com.github.kaboomboom3.simulationtesting.simple.SimpleSimulation;
 import org.apache.commons.cli.*;
 
 import java.util.TreeMap;
@@ -13,6 +14,8 @@ public class Main {
     static {
         AVAILABLE_SIMULATIONS.put("arm", ArmSimulation::new);
         AVAILABLE_SIMULATIONS.put("elevator", ElevatorSimulation::new);
+        AVAILABLE_SIMULATIONS.put("simple-bang-bang", SimpleSimulation::bangBangControlled);
+        AVAILABLE_SIMULATIONS.put("simple-proportional", SimpleSimulation::proportionalControlled);
     }
 
     public static void main(String[] args) {
