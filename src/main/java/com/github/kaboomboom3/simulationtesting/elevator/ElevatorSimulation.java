@@ -1,24 +1,14 @@
 package com.github.kaboomboom3.simulationtesting.elevator;
 
-import com.github.kaboomboom3.simulationtesting.Controller;
 import com.github.kaboomboom3.simulationtesting.Motors;
-import com.github.kaboomboom3.simulationtesting.SimulatedSystem;
+import com.github.kaboomboom3.simulationtesting.Simulation;
 import com.github.kaboomboom3.simulationtesting.Units;
 import com.github.sh0nk.matplotlib4j.Plot;
-import com.github.sh0nk.matplotlib4j.PythonExecutionException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElevatorSimulation implements Runnable {
-    private static final double SIMULATION_LOOP_PERIOD = 1.0 * Units.MICROSECOND;
-    private static final double SIMULATION_LENGTH = 1.5 * Units.SECOND;
-
-    private static final double RECORD_LOOP_PERIOD = 5.0 * Units.MILLISECOND;
-
-    private static final double CONTROL_LOOP_PERIOD = 5.0 * Units.MILLISECOND;
-
+public class ElevatorSimulation extends Simulation<ElevatorState, Double> {
     private static final ElevatorSystemInformation SYSTEM_INFORMATION = new ElevatorSystemInformation(
             Motors.CIM,
             10.0 * Units.POUND,
@@ -28,55 +18,45 @@ public class ElevatorSimulation implements Runnable {
     private static final double POSITION_GAIN = 1000.0;
     private static final double VELOCITY_GAIN = 0.0;
 
-    private SimulatedSystem<ElevatorState, Double> system = new SimulatedElevatorSystem(SYSTEM_INFORMATION);
-    private Controller<ElevatorState, Double> controller = new ElevatorController(
-            POSITION_GAIN,
-            VELOCITY_GAIN,
-            SYSTEM_INFORMATION
-    );
+    private List<Double> recordedTimes = new ArrayList<>();
+    private List<Double> recordedPositions = new ArrayList<>();
+    private List<Double> recordedVelocities = new ArrayList<>();
+    private List<Double> recordedReferences = new ArrayList<>();
+    private List<Double> recordedVoltages = new ArrayList<>();
+    private List<Double> recordedCurrents = new ArrayList<>();
+
+    public ElevatorSimulation() {
+        super(
+                new SimulatedElevatorSystem(SYSTEM_INFORMATION),
+                new ElevatorController(POSITION_GAIN, VELOCITY_GAIN, SYSTEM_INFORMATION),
+                new ElevatorState(0.0, 0.0)
+        );
+
+        setSimulationLength(2.0 * Units.SECOND);
+    }
 
     @Override
-    public void run() {
-        int simulationIterations = (int) (SIMULATION_LENGTH / SIMULATION_LOOP_PERIOD);
-        int simIterationsPerControlIteration = (int) (CONTROL_LOOP_PERIOD / SIMULATION_LOOP_PERIOD);
-        int simIterationsPerRecordIteration = (int) (RECORD_LOOP_PERIOD / SIMULATION_LOOP_PERIOD);
+    protected ElevatorState getReference(double time, ElevatorState current) {
+        return new ElevatorState(10.0 * Units.FOOT, 0.0 * Units.FOOT_PER_SECOND);
+    }
 
-        List<Double> recordedTimes = new ArrayList<>();
-        List<Double> recordedPositions = new ArrayList<>();
-        List<Double> recordedVelocities = new ArrayList<>();
-        List<Double> recordedReferences = new ArrayList<>();
-        List<Double> recordedVoltages = new ArrayList<>();
-        List<Double> recordedCurrents = new ArrayList<>();
+    @Override
+    protected void record(double time, ElevatorState current, ElevatorState reference, Double input) {
+        recordedTimes.add(time);
+        recordedPositions.add(current.getPosition() / Units.FOOT);
+        recordedVelocities.add(current.getVelocity() / Units.FOOT);
+        recordedReferences.add(reference.getPosition() / Units.FOOT);
+        recordedVoltages.add(input);
+        recordedCurrents.add(
+                SYSTEM_INFORMATION.getMotor().estimateCurrentDraw(
+                        input,
+                        SYSTEM_INFORMATION.convertSystemVelocityToMotorVelocity(current.getVelocity())
+                )
+        );
+    }
 
-        ElevatorState state = new ElevatorState(0.0, 0.0);
-        controller.setReference(new ElevatorState(10.0 * Units.FOOT, 0.0 * Units.FOOT_PER_SECOND));
-
-        double input = 0.0;
-
-        for (int i = 0; i <= simulationIterations; i++) {
-            if (i % simIterationsPerControlIteration == 0) {
-                // Control iteration
-                input = controller.calculate(state);
-            }
-            if (i % simIterationsPerRecordIteration == 0) {
-                recordedTimes.add(i * SIMULATION_LOOP_PERIOD);
-                recordedPositions.add(state.getPosition() / Units.FOOT);
-                recordedVelocities.add(state.getVelocity() / Units.FOOT);
-                recordedReferences.add(controller.getReference().getPosition() / Units.FOOT);
-                recordedVoltages.add(input);
-                recordedCurrents.add(
-                        SYSTEM_INFORMATION.getMotor().estimateCurrentDraw(
-                                input,
-                                SYSTEM_INFORMATION.convertSystemVelocityToMotorVelocity(state.getVelocity())
-                        )
-                );
-            }
-
-            // Simulation iteration
-            state = system.simulate(state, input, SIMULATION_LOOP_PERIOD);
-        }
-
-        Plot plt = Plot.create();
+    @Override
+    protected void makePlots(Plot plt) {
         plt.plot()
                 .label("Position")
                 .add(recordedTimes, recordedPositions);
@@ -92,10 +72,5 @@ public class ElevatorSimulation implements Runnable {
         plt.plot()
                 .label("Current")
                 .add(recordedTimes, recordedCurrents);
-        try {
-            plt.show();
-        } catch (IOException | PythonExecutionException e) {
-            e.printStackTrace();
-        }
     }
 }
