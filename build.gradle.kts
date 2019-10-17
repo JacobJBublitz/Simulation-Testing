@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    compile(project(":common"))
+
     compile(group = "com.github.sh0nk", name = "matplotlib4j", version = "0.4.0")
     compile(group = "commons-cli", name = "commons-cli", version = "1.4")
 
@@ -25,6 +27,11 @@ configure<JavaPluginConvention> {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+tasks.withType<Javadoc> {
+    options {
+        showAll()
+    }
+}
 tasks.withType<Wrapper> {
     gradleVersion = "5.6.2"
     distributionType = Wrapper.DistributionType.ALL

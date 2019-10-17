@@ -52,4 +52,12 @@ public final class ElevatorSystemInformation {
         double pulleyTorque = force * pulleyRadius; // Tp = Fr
         return pulleyTorque / gearRatio; // Tm = Tp / G
     }
+
+    public double getVelocityConstant() {
+        return gearRatio / (pulleyRadius * motor.getVelocityConstant());
+    }
+
+    public double getAccelerationConstant() {
+        return (motor.getResistance() * pulleyRadius * mass) / (gearRatio * motor.getTorqueConstant());
+    }
 }

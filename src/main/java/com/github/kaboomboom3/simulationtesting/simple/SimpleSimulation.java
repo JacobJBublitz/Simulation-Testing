@@ -9,6 +9,10 @@ import java.util.List;
 public final class SimpleSimulation extends Simulation<SimpleState, Double> {
     private List<Double> recordedTimes = new ArrayList<>();
     private List<Double> recordedPositions = new ArrayList<>();
+    private List<Double> recordedVelocities = new ArrayList<>();
+    private List<Double> recordedReferences = new ArrayList<>();
+    private List<Double> recordedVoltages = new ArrayList<>();
+
 
     public SimpleSimulation(SimulatedSystem<SimpleState, Double> system, Controller<SimpleState, Double> controller) {
         super(system, controller, new SimpleState(0.0 * Units.FOOT, 0.0 * Units.FOOT_PER_SECOND));
@@ -42,11 +46,18 @@ public final class SimpleSimulation extends Simulation<SimpleState, Double> {
     protected void record(double time, SimpleState current, SimpleState reference, Double input) {
         recordedTimes.add(time);
         recordedPositions.add(current.getPosition() / Units.FOOT);
+        recordedVelocities.add(current.getVelocity() / Units.FOOT_PER_SECOND);
+        recordedReferences.add(reference.getPosition() / Units.FOOT);
+        recordedVoltages.add(input);
     }
 
     @Override
     protected void makePlots(Plot plt) {
         plt.plot()
                 .add(recordedTimes, recordedPositions);
+        plt.plot()
+                .add(recordedTimes, recordedReferences);
+        plt.plot()
+                .add(recordedTimes, recordedVelocities);
     }
 }

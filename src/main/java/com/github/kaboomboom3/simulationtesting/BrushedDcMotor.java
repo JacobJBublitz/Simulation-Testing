@@ -115,4 +115,16 @@ public final class BrushedDcMotor {
     public double getMaxVelocity() {
         return maxVelocity;
     }
+
+    public double getVelocityConstant() {
+        return velocityConstant;
+    }
+
+    public double getTorqueConstant() {
+        return torqueConstant;
+    }
+
+    public double getResistance() {
+        return resistance;
+    }
 }
