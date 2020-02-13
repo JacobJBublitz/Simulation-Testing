@@ -4,10 +4,11 @@ public class Units {
     public static final double SECOND = 1.0;
     public static final double MILLISECOND = 1.0e-3 * SECOND;
     public static final double MICROSECOND = 1.0e-6 * SECOND;
+    public static final double NANOSECOND = 1.0e-9 * SECOND;
     public static final double MINUTE = 60.0 * SECOND;
 
     public static final double METER = 1.0;
-    public static final double CENTIMETER = 1.0e-3 * METER;
+    public static final double CENTIMETER = 1.0e-2 * METER;
     public static final double INCH = 2.54 * CENTIMETER;
     public static final double FOOT = 12.0 * INCH;
 
@@ -26,5 +27,6 @@ public class Units {
 
     public static final double KILOGRAM = 1.0;
     public static final double GRAM = 1.0e-3 * KILOGRAM;
-    public static final double POUND = 453.59237 * GRAM;
+    public static final double OUNCE = 28.34952 * GRAM;
+    public static final double POUND = 16 * OUNCE;
 }

@@ -15,6 +15,8 @@ public abstract class Simulation<State, Input> implements Runnable {
 
     private double controlLoopPeriod = 5.0 * Units.MILLISECOND;
 
+    private boolean showGraph = true;
+
     public Simulation(SimulatedSystem<State, Input> system, Controller<State, Input> controller, State initialState) {
         this.system = system;
         this.controller = controller;
@@ -31,6 +33,10 @@ public abstract class Simulation<State, Input> implements Runnable {
 
     public void setSimulationLoopPeriod(double simulationLoopPeriod) {
         this.simulationLoopPeriod = simulationLoopPeriod;
+    }
+
+    public void setShouldShowGraph(boolean showGraph) {
+        this.showGraph = showGraph;
     }
 
     public Controller<State, Input> getController() {
@@ -61,14 +67,16 @@ public abstract class Simulation<State, Input> implements Runnable {
             current = system.simulate(current, input, simulationLoopPeriod);
         }
 
-        Plot plt = Plot.create();
+        if (showGraph) {
+            Plot plt = Plot.create();
 
-        makePlots(plt);
+            makePlots(plt);
 
-        try {
-            plt.show();
-        } catch (IOException | PythonExecutionException e) {
-            e.printStackTrace();
+            try {
+                plt.show();
+            } catch (IOException | PythonExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
