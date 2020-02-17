@@ -21,21 +21,22 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
 
     private static final double TARGET_HEIGHT = 8 * Units.FOOT + 2.25 * Units.INCH;
 
+    private static final double FLYWHEEL_DIAMETER = 4.0 * Units.INCH;
+
     private List<Vector2> recordedPositions = new ArrayList<>();
 
     private final double[] distances;
-    private final double flywheelVelocity;
-    private final double hoodAngle;
+    private final Vector2 initialVelocity;
 
     private TargetHitState[] targetHitStates;
 
-    public ProjectileSimulation(double[] distances, double flywheelVelocity, double hoodAngle) {
+    public ProjectileSimulation(double[] distances, Vector2 initialVelocity) {
         super(
                 new ProjectileSystem(SYSTEM_INFORMATION),
                 new NullController(),
                 new ProjectileState(
                         new Vector2(0.0, 22.0 * Units.INCH),
-                        Vector2.fromAngle(Rotation2.fromRadians(hoodAngle)).scale(flywheelVelocity * Units.INCH),
+                        initialVelocity,
                         Vector2.ZERO,
                         -0.1,
                         0.0
@@ -43,8 +44,7 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
         );
         this.distances = distances;
         targetHitStates = new TargetHitState[distances.length];
-        this.flywheelVelocity = flywheelVelocity;
-        this.hoodAngle = hoodAngle;
+        this.initialVelocity = initialVelocity;
     }
 
     public static void main(String[] args) {
@@ -60,8 +60,8 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
                  hoodAngle += 0.5 * Units.DEGREE) {
                 var sim = new ProjectileSimulation(
                         distances,
-                        flywheelVelocity,
-                        hoodAngle
+                        Vector2.fromAngle(Rotation2.fromRadians(Math.PI / 2.0 - hoodAngle / Units.RADIAN))
+                                .scale(0.25 * FLYWHEEL_DIAMETER * flywheelVelocity)
                 );
                 sim.setControlLoopPeriod(10.0 * Units.MILLISECOND);
                 sim.setSimulationLoopPeriod(10.0 * Units.MILLISECOND);
@@ -91,8 +91,8 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
 
             System.out.printf("Best (%.1f ft) -- Hood angle: %.1f degrees, Flywheel Velocity: %.0f RPM, Ball Y Velocity: %.3f ft/s%n",
                     distances[i] / Units.FOOT,
-                    bestSimulations[i].getHoodAngle() / Units.DEGREE,
-                    bestSimulations[i].getFlywheelVelocity() / Units.REVOLUTION_PER_MINUTE,
+                    90.0 - bestSimulations[i].getInitialVelocity().getAngle().toDegrees(),
+                    4.0 * bestSimulations[i].getInitialVelocity().length / FLYWHEEL_DIAMETER / Units.REVOLUTION_PER_MINUTE,
                     bestSimulations[i].getTargetHitStates()[i].projectileState.getVelocity().y / Units.FOOT_PER_SECOND);
         }
     }
@@ -105,12 +105,8 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
         return distances;
     }
 
-    public double getFlywheelVelocity() {
-        return flywheelVelocity;
-    }
-
-    public double getHoodAngle() {
-        return hoodAngle;
+    public Vector2 getInitialVelocity() {
+        return initialVelocity;
     }
 
     public List<Vector2> getRecordedPositions() {
@@ -141,7 +137,8 @@ public class ProjectileSimulation extends Simulation<ProjectileState, Double> {
     }
 
     @Override
-    protected void makePlots(Plot plt) { }
+    protected void makePlots(Plot plt) {
+    }
 
     private static class NullController extends Controller<ProjectileState, Double> {
         @Override
